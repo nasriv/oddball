@@ -51,7 +51,7 @@ async def on_message(message):
                 else:
                     await message.channel.send(str(k)+": *"+str(v)+"*")
 
-            time.sleep(2)
+            time.sleep(15)
             await message.channel.send("answer is.... "+result["ans"])
             
             
