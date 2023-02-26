@@ -1,5 +1,6 @@
 import requests
 import html
+import sqlite3
 
 def get_question():
     # pull question and return various string values in dict form for bot parsing
@@ -39,22 +40,31 @@ def get_question():
                 "point value": str(point_val),
                 "q": str(question),
                 "a": str(all_choices),
-                "ans": str(answer)
+                "correctAns": str(answer)
                 }
         
     except:
         return 'error-trivia api'
     
-def add_points():
-    pass
+def add_score(user, points):
+    conn = sqlite3.connect('triviaBot.db')
+    c = conn.cursor()
+    c.execute("UPDATE scoreboard set score=score+?, q_played=q_played+1, numCorr=numCorr+1 where name=?",(points, user))
+    conn.commit()
+    conn.close()
 
-def write_scores():
-    pass
-
-def read_scores():
-    pass
+def add_game_data(user):
+    conn = sqlite3.connect('triviaBot.db')
+    c = conn.cursor()
+    c.execute("UPDATE scoreboard set q_played=q_played+1 where name=?",(user))
+    #BUG
+    conn.commit()
+    conn.close()
 
 def question_counter():
+    pass
+
+def db_init():
     pass
 
 #get_question()
