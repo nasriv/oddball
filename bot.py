@@ -39,6 +39,7 @@ async def on_message(message):
         if message.content.startswith(f'$help'):
             await message.channel.send(f"Hello {str(message.author).split('#')[0]}!\nI'm the trivia bot!\nI can generate trivia questions, just message **`$trivia`** to start!!\nYou'll have 10 seconds to answer each question before I reveal the answer")
 
+        # get trivia question
         if message.content.startswith(f'$trivia'):
             result = get_question()
             for k, v in result.items():
@@ -53,6 +54,16 @@ async def on_message(message):
 
             time.sleep(15)
             await message.channel.send("answer is.... "+result["ans"])
+
+        # get current scoreboard
+        if message.content == ('$scoreboard'):
+            members = bot.get_all_members()
+            await message.channel.send("**Player.....[Score].....[Q's Answered].....[% Correct]**")                 
+            for member in members:
+                # only return message if member not bot role
+                if not member.bot:
+                    await message.channel.send(str(member).split('#')[0])
+            await message.channel.send("Scoreboard coming soon...")
             
             
 
