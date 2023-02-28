@@ -38,10 +38,11 @@ async def on_message(message):
 
     if message.channel.name == "dev_test_env":
         if message.content.startswith(f'$help'):
+            #TODO update to include all command calls a user can make
             await message.channel.send(f"Hello {str(message.author).split('#')[0]}!\nI'm the trivia bot!\nI can generate trivia questions, just message **`$trivia`** to start!!\nYou'll have 10 seconds to answer each question before I reveal the answer")
 
         # get trivia question
-        if message.content.startswith(f'$trivia'):
+        if message.content == ('$trivia'):
             
             result = get_question()
             for k, v in result.items():
@@ -71,7 +72,7 @@ async def on_message(message):
             # await asyncio.sleep(timeout)
             await message.channel.send("Answer ....**"+result["correctAns"]+"**")
 
-            # print(f"submitted answer dictionary: {answers}")
+            print(f"submitted answer dictionary: {answers}")
 
             # check user answers and update db to add or remove points
             for author, ans in answers.items():
@@ -79,38 +80,61 @@ async def on_message(message):
                 if ans is None:
                     continue
                 elif ans.lower() == result["correctAns"].lower():
-                    print("add point value")
                     add_score(author, result["point value"])
                 else:
                     # if answer is wrong increment game played
-                    print("wrong: increment question count")
                     add_game_data(author)
 
 
         # get current scoreboard
         if message.content == ('$scoreboard'):          
-            await message.channel.send('------ Scoreboard ------\n >>> {}'.format('\n'.join(get_scores())))
+            # await message.channel.send('------ Scoreboard ------\n >>> {}'.format('\n'.join(get_scores())))
+            await message.channel.send(f"```{get_scores()}```")
+
+        if message.content == ('$chart'):
+            # return pie chart of trivia questions returned thus far
+            await message.channel.send(get_trivia_chart())
 
         # initialize db
-        if message.content == ('$init'):
+        if message.content == ('$init') and message.author.name == 'wickabeast33':
             # connect to db
             conn = sqlite3.connect("triviaBot.db")
             print("db connected")
             c = conn.cursor()
 
-            # create initial table
-            c.execute("create table if not exists scoreboard (id text primary key,username text not null,name text not null,score integer,q_played integer,numCorr integer);")
-            
-            # get all members in channel
+            # create initial scoreboard and question log table
+            c.execute(
+                '''create table if not exists scoreboard 
+            (id text primary key,
+            username text not null,
+            name text not null,
+            score integer,
+            q_played integer,
+            numCorr integer);''')
+            conn.commit()
+
+            c.execute(
+                '''create table if not exists triviaLog
+                (id integer primary key autoincrement,
+                datetime text,
+                difficulty text,
+                point_value integer,
+                category text
+                );''')
+            conn.commit()
+
+            # get all members in channel and load into db
             members = bot.get_all_members()
-            
             for member in members:
                 # only return message if member not bot role
                 if not member.bot:
-                    c.execute(f"INSERT INTO scoreboard (id, username, name, score, q_played, numCorr) VALUES (?,?,?,?,?,?)", (str(member.id),str(member),str(member.name),0,0,0))
-            conn.commit()
+                    try:
+                        c.execute(f"INSERT INTO scoreboard (id, username, name, score, q_played, numCorr) VALUES (?,?,?,?,?,?)", (str(member.id),str(member),str(member.name),0,0,0))
+                        conn.commit()
+                    except sqlite3.Error:
+                        await message.channel.send(sqlite3.Error)          
             conn.close()
-            await message.channel.send("db initialized")
+            await message.channel.send("`db initialization complete`")
 
             
 # get bot token from .env and run client
