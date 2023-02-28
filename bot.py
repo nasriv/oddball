@@ -43,9 +43,6 @@ async def on_message(message):
         # get trivia question
         if message.content.startswith(f'$trivia'):
             
-            global answers
-            i=0
-
             result = get_question()
             for k, v in result.items():
                 if k == "q":
@@ -58,6 +55,8 @@ async def on_message(message):
                     await message.channel.send(str(k)+": *"+str(v)+"*")
 
             # collect trivia answers
+            global answers
+            i=0
             answers={}
             for i in range(10):
                 try:
