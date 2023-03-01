@@ -36,7 +36,7 @@ async def on_message(message):
     # lower case message
     message_content = message.content.lower()
 
-    if message.channel.name == "dev_test_env":
+    if message.channel.name == "trivia-corner":
         if message.content.startswith(f'$help'):
             #TODO update to include all command calls a user can make
             await message.channel.send(f"Hello {str(message.author).split('#')[0]}!\nI'm the trivia bot!\nI can generate trivia questions, just message **`$trivia`** to start!!\nYou'll have 10 seconds to answer each question before I reveal the answer")
