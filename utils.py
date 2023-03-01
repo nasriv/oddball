@@ -3,6 +3,9 @@ from table2ascii import table2ascii, PresetStyle, Alignment
 from datetime import datetime
 import sqlite3
 
+global pi_DBpath 
+pi_DBpath = "/home/raspi-001/Documents/oddball/triviaBot.db"
+
 def get_question():
     # pull question and return various string values in dict form for bot parsing
     try:
@@ -56,14 +59,14 @@ def get_question():
             }
     
 def add_score(user, points):
-    conn = sqlite3.connect('triviaBot.db')
+    conn = sqlite3.connect('pi_DBpath')
     c = conn.cursor()
     c.execute("UPDATE scoreboard set score=score+?, q_played=q_played+1, numCorr=numCorr+1 where name=?",(points, user))
     conn.commit()
     conn.close()
 
 def add_game_data(user):
-    conn = sqlite3.connect('triviaBot.db')
+    conn = sqlite3.connect(pi_DBpath)
     c = conn.cursor()
     c.execute("UPDATE scoreboard set q_played=q_played+1 where name=?",(user,))
     conn.commit()
@@ -73,7 +76,7 @@ def get_scores():
 
     import matplotlib.pyplot as plt
 
-    conn = sqlite3.connect("triviaBot.db")
+    conn = sqlite3.connect(triviaBot.db)
     c = conn.cursor()
     result = c.execute(
         '''select name as "Player", 
@@ -127,7 +130,7 @@ def get_scores():
     return output
 
 def insert_trivia_log(difficulty, category, point_value):
-    conn = sqlite3.connect("triviaBot.db")
+    conn = sqlite3.connect(pi_DBpath)
     c = conn.cursor()
     c.execute('''
     insert into triviaLog
@@ -146,7 +149,7 @@ def get_question_chart():
     import numpy as np
 
     # load question data from triviaLog
-    conn = sqlite3.connect('triviaBot.db')
+    conn = sqlite3.connect(pi_DBpath)
     c = conn.cursor()
     response = c.execute(
         '''select 

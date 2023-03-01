@@ -104,7 +104,7 @@ async def on_message(message):
         # initialize db
         if message.content == ('$init') and message.author.name == 'wickabeast33':
             # connect to db
-            conn = sqlite3.connect("triviaBot.db")
+            conn = sqlite3.connect(pi_DBpath)
             print("db connected")
             c = conn.cursor()
 
