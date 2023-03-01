@@ -12,7 +12,10 @@ def get_question():
         print("--- question API request error ---")
 
     # q_type = json_response['type']
-    category = json_response['category']
+    try:
+        category = json_response['category'].split(': ')[1]
+    except:
+        category = json_response['category']
     question = html.unescape(json_response['question'])
     diff = json_response['difficulty']
     answer = html.unescape(json_response['correct_answer'])
@@ -67,6 +70,9 @@ def add_game_data(user):
     conn.close()
 
 def get_scores():
+
+    import matplotlib.pyplot as plt
+
     conn = sqlite3.connect("triviaBot.db")
     c = conn.cursor()
     result = c.execute(
@@ -90,7 +96,34 @@ def get_scores():
         style=PresetStyle.plain
     )
 
+    players, points, corrRate, qPlayed = [],[],[],[]
+    for item in response:
+        players.append(item[0])
+        points.append(float(item[1]))
+        corrRate.append(float(item[2]))
+        qPlayed.append(float(item[3]))
+
+    print(players,points,corrRate, qPlayed)
+
     conn.close()
+
+    # create chart
+    filename = "score_chart.jpg"
+
+    plt.rcdefaults()
+    fig, ax = plt.subplots()
+
+    # Example data
+    ax.scatter(corrRate, points, s=qPlayed, label=players)
+    ax.grid(alpha=0.15)
+    ax.set_xlabel('% Questions Answered Correctly')
+    ax.set_ylabel('Total Points')
+    ax.set_title('Leaderboard')
+
+    fig.savefig(filename, bbox_inches='tight', dpi=100)
+    
+    print(str(datetime.now())+" --- scoreboard chart created") 
+
     return output
 
 def insert_trivia_log(difficulty, category, point_value):
@@ -108,9 +141,9 @@ def insert_trivia_log(difficulty, category, point_value):
 
     print(datetime.now()," ---- added q to trivia log")
 
-def get_trivia_chart():
-    #TODO Add in bar chart for some minor analytics or question distribution
-    url_base = "https://quickchart.io/chart?c="
+def get_question_chart():
+    import matplotlib.pyplot as plt
+    import numpy as np
 
     # load question data from triviaLog
     conn = sqlite3.connect('triviaBot.db')
@@ -123,15 +156,33 @@ def get_trivia_chart():
         group by category;
     ''')
 
-    data_val = []
-    label_val = []
+    count = []
+    labels = []
     for item in response.fetchall():
-        data_val.append(item[1])
-        label_val.append(item[0])
+        count.append(item[1])
+        labels.append(item[0])
 
     conn.close()
+
+    # create chart
+    filename = "chart_question.jpg"
+
+    plt.rcdefaults()
+    fig, ax = plt.subplots()
+
+    # Example data
+    y_pos = np.arange(len(labels))
+    ax.barh(y_pos, count)
+    ax.set_yticks(y_pos, labels=labels)
+    ax.invert_yaxis()  # labels read top-to-bottom
+    ax.set_xlabel('Question Count')
+    ax.set_title('Current Trivia Question Distribution')
+
+    fig.savefig(filename, bbox_inches='tight', dpi=100)
     
-    return None
+    print(str(datetime.now())+" --- question chart created")
+
+    return filename
 
 
 
@@ -139,4 +190,4 @@ def get_trivia_chart():
 #get_question()
 # ----- testing --------
 # print(get_scores())
-print(get_trivia_chart())
+# print(get_trivia_chart())

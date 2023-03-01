@@ -59,13 +59,16 @@ async def on_message(message):
             global answers
             i=0
             answers={}
-            for i in range(10):
+            for i in range(20):
                 try:
                     message = await bot.wait_for('message', timeout=1)
                     if message.author.bot or message.author.name in answers:
                         continue
+                    if message.content != '$trivia':
                     # print(f"Submitting message: {message.content}")
-                    answers[str(message.author.name)] = message.content.lower()
+                        answers[str(message.author.name)] = message.content.lower()
+                    else:
+                        continue
                 except asyncio.TimeoutError:
                     continue
 
@@ -87,13 +90,16 @@ async def on_message(message):
 
 
         # get current scoreboard
-        if message.content == ('$scoreboard'):          
+        if message.content == ('$leaderboard'):          
             # await message.channel.send('------ Scoreboard ------\n >>> {}'.format('\n'.join(get_scores())))
             await message.channel.send(f"```{get_scores()}```")
+            await message.channel.send(file=discord.File('score_chart.jpg'))
 
-        # if message.content == ('$chart'):
-        #     # return pie chart of trivia questions returned thus far
-        #     await message.channel.send(get_trivia_chart())
+        if message.content == ('$chart'):
+            # return pie chart of trivia questions returned thus far
+            filename = get_question_chart()
+            await message.channel.send(file=discord.File(filename))
+
 
         # initialize db
         if message.content == ('$init') and message.author.name == 'wickabeast33':
