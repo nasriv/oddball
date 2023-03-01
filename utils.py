@@ -1,10 +1,13 @@
-import requests, html, pytz
+import requests, html, pytz, os
 from table2ascii import table2ascii, PresetStyle, Alignment
 from datetime import datetime
 import sqlite3
 
 global pi_DBpath 
 pi_DBpath = "/home/raspi-001/Documents/oddball/triviaBot.db"
+
+global home_path
+home_path = '/home/raspi-001/Documents/oddball'
 
 def get_question():
     # pull question and return various string values in dict form for bot parsing
@@ -59,7 +62,7 @@ def get_question():
             }
     
 def add_score(user, points):
-    conn = sqlite3.connect('pi_DBpath')
+    conn = sqlite3.connect(pi_DBpath)
     c = conn.cursor()
     c.execute("UPDATE scoreboard set score=score+?, q_played=q_played+1, numCorr=numCorr+1 where name=?",(points, user))
     conn.commit()
@@ -76,7 +79,7 @@ def get_scores():
 
     import matplotlib.pyplot as plt
 
-    conn = sqlite3.connect(triviaBot.db)
+    conn = sqlite3.connect(pi_DBpath)
     c = conn.cursor()
     result = c.execute(
         '''select name as "Player", 
@@ -123,7 +126,7 @@ def get_scores():
     ax.set_ylabel('Total Points')
     ax.set_title('Leaderboard')
 
-    fig.savefig(filename, bbox_inches='tight', dpi=100)
+    fig.savefig(os.path.join(home_path,filename), bbox_inches='tight', dpi=100)
     
     print(str(datetime.now())+" --- scoreboard chart created") 
 
@@ -181,7 +184,7 @@ def get_question_chart():
     ax.set_xlabel('Question Count')
     ax.set_title('Current Trivia Question Distribution')
 
-    fig.savefig(filename, bbox_inches='tight', dpi=100)
+    fig.savefig(os.path.join(home_path,filename), bbox_inches='tight', dpi=100)
     
     print(str(datetime.now())+" --- question chart created")
 

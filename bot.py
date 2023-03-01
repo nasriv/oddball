@@ -13,6 +13,7 @@ load_dotenv()
 description = '''An example bot to showcase the discord.ext.commands extension
 module.'''
 
+
 # instantiate discord client
 intents = discord.Intents.default()
 intents.members = True
@@ -93,12 +94,12 @@ async def on_message(message):
         if message.content == ('$leaderboard'):          
             # await message.channel.send('------ Scoreboard ------\n >>> {}'.format('\n'.join(get_scores())))
             await message.channel.send(f"```{get_scores()}```")
-            await message.channel.send(file=discord.File('score_chart.jpg'))
+            await message.channel.send(file=discord.File(os.path.join(home_path,'score_chart.jpg')))
 
         if message.content == ('$chart'):
             # return pie chart of trivia questions returned thus far
             filename = get_question_chart()
-            await message.channel.send(file=discord.File(filename))
+            await message.channel.send(file=discord.File(os.path.join(home_path,filename)))
 
 
         # initialize db
