@@ -110,10 +110,33 @@ def insert_trivia_log(difficulty, category, point_value):
 
 def get_trivia_chart():
     #TODO Add in bar chart for some minor analytics or question distribution
-    return "https://quickchart.io/chart?c={type:'line',data:{labels:['January','February','March','April','May'],datasets:[{label:'Dogs',data:[50,60,70,180,190],fill:false,borderColor:'blue'},{label:'Cats',data:[100,200,300,400,500],fill:false,borderColor:'green'}]}}"
+    url_base = "https://quickchart.io/chart?c="
+
+    # load question data from triviaLog
+    conn = sqlite3.connect('triviaBot.db')
+    c = conn.cursor()
+    response = c.execute(
+        '''select 
+        category,
+        count(category)
+        from triviaLog
+        group by category;
+    ''')
+
+    data_val = []
+    label_val = []
+    for item in response.fetchall():
+        data_val.append(item[1])
+        label_val.append(item[0])
+
+    conn.close()
+    
+    return None
+
 
 
 
 #get_question()
 # ----- testing --------
 # print(get_scores())
+print(get_trivia_chart())

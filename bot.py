@@ -91,9 +91,9 @@ async def on_message(message):
             # await message.channel.send('------ Scoreboard ------\n >>> {}'.format('\n'.join(get_scores())))
             await message.channel.send(f"```{get_scores()}```")
 
-        if message.content == ('$chart'):
-            # return pie chart of trivia questions returned thus far
-            await message.channel.send(get_trivia_chart())
+        # if message.content == ('$chart'):
+        #     # return pie chart of trivia questions returned thus far
+        #     await message.channel.send(get_trivia_chart())
 
         # initialize db
         if message.content == ('$init') and message.author.name == 'wickabeast33':
